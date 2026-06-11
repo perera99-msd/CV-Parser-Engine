@@ -5,6 +5,7 @@ const mongoose = require('mongoose');
 const multer = require('multer');
 const cors = require('cors');
 const { parseRawText } = require('./utils/regexParser');
+const { parseWithAI } = require('./utils/aiParser');
 const Resume = require('./models/Resume');
 const pdf = require('pdf-parse');
 
@@ -49,8 +50,21 @@ app.post('/api/upload', upload.single('cv'), async (req, res) => {
       return res.status(415).json({ error: 'Unsupported media asset format. Please supply a PDF.' });
     }
 
-    // Process raw string data deterministically using our regex parser
-    const structuredProfile = parseRawText(rawText);
+    let structuredProfile;
+    
+    // Attempt parsing with AI if key is present, fallback to Regex if it fails
+    if (process.env.GEMINI_API_KEY) {
+      try {
+        console.log("Using AI Parser...");
+        structuredProfile = await parseWithAI(rawText);
+      } catch (aiError) {
+        console.error("AI Parser failed, falling back to RegEx:", aiError);
+        structuredProfile = parseRawText(rawText);
+      }
+    } else {
+      console.log("GEMINI_API_KEY not found. Using RegEx Parser...");
+      structuredProfile = parseRawText(rawText);
+    }
 
     // Persist parsed schema downstream into MongoDB
     const savedProfile = new Resume(structuredProfile);
