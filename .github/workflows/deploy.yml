@@ -27,7 +27,7 @@ jobs:
             cd backend
             
             # Rebuild and restart the Docker container seamlessly
-            docker-compose up -d --build
+            docker compose up -d --build
             
             # Clean up old unused Docker images to save disk space
             docker image prune -f
