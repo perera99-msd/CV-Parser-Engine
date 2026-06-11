@@ -1,0 +1,8 @@
+{
+  "name": "cv-extract-monorepo",
+  "private": true,
+  "workspaces": [
+    "frontend",
+    "backend"
+  ]
+}
