@@ -10,8 +10,12 @@ const pdf = require('pdf-parse');
 
 const app = express();
 
+// Define allowed origins for CORS
+const allowedOrigins = [process.env.FRONTEND_URL, 'http://localhost:3000'];
+const corsOptions = { origin: allowedOrigins };
+
 // Middleware
-app.use(cors());
+app.use(cors(corsOptions));
 app.use(express.json());
 
 // Multi-part form handler storage configurations

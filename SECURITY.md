@@ -14,6 +14,6 @@ We take all security bugs in ResuMap seriously. Thank you for improving the secu
 
 To report a security vulnerability, please email `[YOUR_SECURITY_EMAIL]` with a detailed description of the vulnerability and steps to reproduce it.
 
-**Please do not report security vulnerabilities through public GitHub issues.**
+**Please do not report security vulnerabilities through public GitHub issues, to protect the project and its users.**
 
 You should receive a response within 48 hours. If the issue is confirmed, we will release a patch as quickly as possible depending on complexity.
