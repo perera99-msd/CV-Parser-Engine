@@ -37,3 +37,9 @@ Thumbs.db
 *.njsproj
 *.sln
 *.sw?
+
+# SSH Keys and Secrets
+*.pem
+
+# Ignore broken Windows file
+License.

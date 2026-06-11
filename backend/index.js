@@ -6,9 +6,7 @@ const multer = require('multer');
 const cors = require('cors');
 const { parseRawText } = require('./utils/regexParser');
 const Resume = require('./models/Resume');
-
-// ⬇️ FIX: Import the new PDFParse class from v2.x correctly
-const { PDFParse } = require('pdf-parse');
+const pdf = require('pdf-parse');
 
 const app = express();
 
@@ -40,17 +38,9 @@ app.post('/api/upload', upload.single('cv'), async (req, res) => {
     
     // Validate file type
     if (req.file.mimetype === 'application/pdf') {
-      
-      // ⬇️ FIX: Use the v2 API class instantiation and getText() method
-      const parser = new PDFParse({ data: req.file.buffer });
-      const pdfData = await parser.getText();
+      // Use the stable and official pdf-parse API
+      const pdfData = await pdf(req.file.buffer);
       rawText = pdfData.text;
-      
-      // Good practice in v2: Destroy the instance to free memory
-      if (parser.destroy) {
-        await parser.destroy();
-      }
-
     } else {
       return res.status(415).json({ error: 'Unsupported media asset format. Please supply a PDF.' });
     }
