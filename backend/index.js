@@ -12,7 +12,7 @@ const pdf = require('pdf-parse');
 const app = express();
 
 // Define allowed origins for CORS
-const allowedOrigins = [process.env.FRONTEND_URL, 'http://localhost:3000'];
+const allowedOrigins = [process.env.FRONTEND_URL, 'http://localhost:3000', 'https://cv-parser-engine.pages.dev'];
 const corsOptions = { origin: allowedOrigins };
 
 // Middleware
