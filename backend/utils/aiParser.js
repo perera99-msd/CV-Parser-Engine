@@ -1,6 +1,9 @@
 const { GoogleGenAI, Type } = require('@google/genai');
 
-const ai = new GoogleGenAI(); // It will automatically use the GEMINI_API_KEY environment variable
+let ai;
+if (process.env.GEMINI_API_KEY) {
+  ai = new GoogleGenAI(); // It will automatically use the GEMINI_API_KEY environment variable
+}
 
 async function parseWithAI(rawText) {
   const schema = {
