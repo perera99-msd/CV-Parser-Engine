@@ -26,6 +26,9 @@ jobs:
             
             cd backend
             
+            # Inject environment variables from GitHub Secrets
+            echo "GEMINI_API_KEY=${{ secrets.GEMINI_API_KEY }}" > .env
+            
             # Rebuild and restart the Docker container seamlessly
             docker compose up -d --build
             
