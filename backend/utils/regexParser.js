@@ -76,44 +76,32 @@ function parseRawText(text) {
     .map(s => s.trim())
     .filter(s => s.length > 1 && s.length < 40);
 
-  // --- Process Projects (Tolerant of multiline wrapping) ---
+  // --- Process Projects (Strict Metadata Only) ---
   let projBlock = null;
   for (let i = 0; i < sections.projects.length; i++) {
     let line = sections.projects[i];
     const isStack = /^(Tech )?Stack:|Technologies:/i.test(line); 
     const isLink = /https?:\/\//i.test(line) || /github\.com/i.test(line) || /vercel\.app/i.test(line);
-    const isBullet = line.startsWith('•') || line.startsWith('●') || line.startsWith('-');
 
-    if (!isBullet && !isStack && !isLink && line.length < 100) {
-      // If it doesn't look like a bullet and isn't a link/stack, it might be a title or wrapped text.
-      // If we already have details, it's a new project.
-      if (!projBlock || projBlock.details.length > 0 || projBlock.techStack || projBlock.link) {
+    if (!isStack && !isLink && line.length < 80 && !line.startsWith('•') && !line.startsWith('●') && !line.startsWith('-') && !line.endsWith('.')) {
+      if (!projBlock || projBlock.techStack || projBlock.link) {
         if (projBlock) profile.projects.push(projBlock);
         projBlock = { 
           name: line.replace(/Link|GitHub|Live Site/ig, '').replace(/[-|]/g, '').trim(), 
           techStack: '', link: '', details: [] 
         };
       } else {
-        // Just title wrapping
         projBlock.name += " " + line.trim();
       }
     } else if (isStack && projBlock) {
       projBlock.techStack = line.replace(/^(Tech )?Stack:\s*|Technologies:\s*/i, '').trim();
     } else if (isLink && projBlock) {
       projBlock.link = line;
-    } else if (projBlock) {
-      let cleanDetail = line.replace(/^[-•●]\s*/, '').trim();
-      if (isBullet || projBlock.details.length === 0) {
-        projBlock.details.push(cleanDetail);
-      } else {
-        // Line didn't start with a bullet, it wrapped from the previous line
-        projBlock.details[projBlock.details.length - 1] += ' ' + cleanDetail;
-      }
     }
   }
   if (projBlock) profile.projects.push(projBlock);
 
-  // --- Process Experience (Highly Tolerant) ---
+  // --- Process Experience (Strict Metadata Only) ---
   let expBlock = null;
   for (let i = 0; i < sections.experience.length; i++) {
     let line = sections.experience[i];
@@ -122,8 +110,9 @@ function parseRawText(text) {
     const isLocation = /(Remote|Hybrid|On-site)/i.test(line) && line.length < 20;
     const isBullet = line.startsWith('•') || line.startsWith('●') || line.startsWith('-');
     
-    if (!isBullet && !isDate && !isLocation && line.length < 70) {
-      if (!expBlock || expBlock.duration || expBlock.details.length > 0) {
+    // Treat as title/company only if it's short and not a date/location/bullet/description
+    if (!isBullet && !isDate && !isLocation && line.length < 60 && !line.includes(':') && !line.endsWith('.')) {
+      if (!expBlock || expBlock.duration) {
         if (expBlock) profile.experience.push(expBlock);
         expBlock = { role: line, company: '', duration: '', details: [] };
       } else if (!expBlock.company) {
@@ -131,10 +120,6 @@ function parseRawText(text) {
       }
     } else if (isLocation || isDate) {
       if (expBlock) expBlock.duration = expBlock.duration ? expBlock.duration + ' | ' + line : line;
-    } else if (isBullet && expBlock) {
-      expBlock.details.push(line.replace(/^[-•●]\s*/, '').trim());
-    } else if (expBlock && expBlock.details.length > 0) {
-      expBlock.details[expBlock.details.length - 1] += ' ' + line.trim();
     }
   }
   if (expBlock) profile.experience.push(expBlock);
