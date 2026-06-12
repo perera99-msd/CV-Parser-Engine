@@ -28,6 +28,7 @@ jobs:
             
             # Inject environment variables from GitHub Secrets
             echo "GEMINI_API_KEY=${{ secrets.GEMINI_API_KEY }}" > .env
+            echo "MONGODB_URI=${{ secrets.MONGODB_URI }}" >> .env
             
             # Rebuild and restart the Docker container seamlessly
             docker compose up -d --build
