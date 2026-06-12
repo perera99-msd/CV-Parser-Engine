@@ -36,10 +36,10 @@ async function parseWithAI(rawText) {
         items: {
           type: Type.OBJECT,
           properties: {
-            name: { type: Type.STRING, description: "The name of the project." },
-            techStack: { type: Type.STRING, description: "A string listing the technologies used in the project." },
-            link: { type: Type.STRING, description: "URL or link to the project." },
-            details: { type: Type.ARRAY, items: { type: Type.STRING }, description: "Bullet points describing the project features and achievements." }
+            name: { type: Type.STRING, description: "The name of the project. Do not omit any projects found in the text." },
+            techStack: { type: Type.STRING, description: "Technologies, languages, or tools used in this project. Summarize into a string." },
+            link: { type: Type.STRING, description: "URL, GitHub link, or deployment link if present." },
+            details: { type: Type.ARRAY, items: { type: Type.STRING }, description: "Exhaustive bullet points detailing features, tasks, and achievements for this project." }
           }
         }
       },
@@ -59,9 +59,9 @@ async function parseWithAI(rawText) {
         items: {
           type: Type.OBJECT,
           properties: {
-            name: { type: Type.STRING, description: "The name of the certification." },
-            issuer: { type: Type.STRING, description: "The organization that issued the certification." },
-            year: { type: Type.STRING, description: "The year the certification was obtained." }
+            name: { type: Type.STRING, description: "The official name of the certification, license, or badge." },
+            issuer: { type: Type.STRING, description: "The organization, institution, or platform that issued it (e.g., HackerRank, Coursera, Oracle)." },
+            year: { type: Type.STRING, description: "The year or exact date it was obtained. Extract this carefully from the text." }
           }
         }
       }

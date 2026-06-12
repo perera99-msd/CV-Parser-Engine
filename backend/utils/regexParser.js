@@ -46,7 +46,7 @@ function parseRawText(text) {
     let foundNewSection = null;
 
     for (const [key, keywords] of Object.entries(sectionKeywords)) {
-      if (keywords.includes(lowerLine) || (lowerLine.length < 30 && keywords.some(k => lowerLine === k))) {
+      if (keywords.some(kw => lowerLine.startsWith(kw) && line.length < 50)) {
         foundNewSection = key;
         break;
       }
@@ -165,16 +165,24 @@ function parseRawText(text) {
   // --- Process Certifications ---
   for (let i = 0; i < sections.certifications.length; i++) {
     let line = sections.certifications[i];
-    if (line.startsWith('•') || line.startsWith('●')) {
-      let certName = line.replace(/^[•●]\s*/, '').trim();
-      let nextLine = sections.certifications[i + 1] || '';
-      let year = nextLine.match(/\((20\d{2})\)/)?.[1] || 'N/A';
-      let issuer = nextLine.replace(/\(20\d{2}\)/, '').trim();
-      profile.certifications.push({ name: certName, issuer: issuer, year: year });
-    } else if (line.includes('|')) {
-       // Fallback for one-line certifications e.g. "Cert Name | Issuer | Year"
+    if (line.includes('|')) {
        let parts = line.split('|').map(p => p.trim());
-       profile.certifications.push({ name: parts[0], issuer: parts[1] || 'N/A', year: parts[2] || 'N/A' });
+       let issuer = parts[1] || 'N/A';
+       let year = parts[2] || 'N/A';
+       
+       let yearMatch = issuer.match(/(19|20)\d{2}/);
+       if (yearMatch && year === 'N/A') {
+         year = yearMatch[0];
+         issuer = issuer.replace(/\(?(19|20)\d{2}[^)]*\)?/g, '').trim();
+       }
+       
+       profile.certifications.push({ name: parts[0], issuer: issuer, year: year });
+    } else if (line.startsWith('•') || line.startsWith('●')) {
+       let certName = line.replace(/^[•●]\s*/, '').trim();
+       // Ignore empty bullets or standalone years
+       if (certName.length > 5 && !/^(19|20)\d{2}$/.test(certName)) {
+         profile.certifications.push({ name: certName, issuer: 'N/A', year: 'N/A' });
+       }
     }
   }
 
