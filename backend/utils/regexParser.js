@@ -124,24 +124,38 @@ function parseRawText(text) {
   }
   if (expBlock) profile.experience.push(expBlock);
 
-  // --- Process Education ---
+  // --- Process Education (Strict Metadata Only) ---
   let eduBlock = null;
   for (let i = 0; i < sections.education.length; i++) {
     let line = sections.education[i];
-    const isDegree = /(BSc|BA|Master|Diploma|Certificate|G\.C\.E|Level|Degree)/i.test(line);
+    
+    // Ignore description lines or very long lines
+    if (line.toLowerCase().startsWith('core modules') || line.length > 80) continue;
 
-    if (isDegree) {
+    const isDegree = /\b(BSc|B\.Sc|BA|B\.A|Master|Diploma|Certificate|G\.C\.E|Level|Degree)\b/i.test(line);
+
+    if (isDegree || line.includes('|')) {
       if (eduBlock) profile.education.push(eduBlock);
-      eduBlock = { degree: line, institution: '', year: '' };
-    } else if (eduBlock && !line.startsWith('●') && !line.startsWith('•')) {
+      eduBlock = { degree: '', institution: '', year: '' };
+      
+      if (line.includes('|')) {
+        let parts = line.split('|').map(p => p.trim());
+        eduBlock.degree = parts[0];
+        eduBlock.institution = parts[1] || '';
+      } else {
+        eduBlock.degree = line.trim();
+      }
+    } else if (eduBlock) {
       const yearMatch = line.match(/(19|20)\d{2}/);
-      if (yearMatch) eduBlock.year = yearMatch[0];
+      if (yearMatch && !eduBlock.year) eduBlock.year = yearMatch[0];
       
-      let instName = line.replace(/(19|20)\d{2}/, '').replace(/[•●]|Anticipated|Oct|Present|–|-/gi, '').trim();
-      if (instName.endsWith(',')) instName = instName.slice(0, -1);
-      
-      if (instName.length > 0 && !yearMatch) {
-        eduBlock.institution += (eduBlock.institution ? ', ' : '') + instName;
+      if (!line.startsWith('●') && !line.startsWith('•')) {
+        let instName = line.replace(/(19|20)\d{2}/, '').replace(/[•●]|Anticipated|Oct|Present|–|-/gi, '').trim();
+        if (instName.endsWith(',')) instName = instName.slice(0, -1);
+        
+        if (instName.length > 0 && !yearMatch && !eduBlock.institution) {
+          eduBlock.institution = instName;
+        }
       }
     }
   }
