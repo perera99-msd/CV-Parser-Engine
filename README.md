@@ -10,7 +10,7 @@ An end-to-end, deterministic CV extraction system that processes unstructured PD
 Unlike standard NLP or AI wrappers, this engine utilizes a custom-built **State Machine and Heuristic Regex Pipeline** to intelligently bucket, stitch, and structure document data regardless of layout variations.
 
 ## ✨ Key Features
-* **Binary Ingestion:** Secure PDF file uploads utilizing `multer` memory storage.
+* **Binary Ingestion:** Secure PDF file uploads utilizing `multer` memory storage..
 * **Raw Text Extraction:** Accurate text-layer stripping using `pdf-parse`.
 * **State-Machine Parsing:** Advanced look-ahead and look-behind logic to handle broken lines, invisible tables, and dynamic formatting without relying on third-party AI APIs.
 * **Structured Persistence:** Strict validation and data modeling via Mongoose/MongoDB.
